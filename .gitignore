@@ -3,6 +3,6 @@
 mvtec_anomaly_detection
 
 
-cnn_lstm_anomaly_detector.pth
+*.pth
 
 __pycache__

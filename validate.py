@@ -6,16 +6,16 @@ from torchvision import transforms
 import matplotlib.pyplot as plt
 import seaborn as  sns
 from data_loader import transform , MVTecDataset
-from cnn_lstm_model import AnamolyDetector
+from cnn_lstm_model import AnomalyDetector
 
 
 category = "metal_nut"
 root_dir = r"mvtec_anomaly_detection"
-model_path = r"C:\Users\ipand\Desktop\AnamolyDetector\cnn_lstm_anomaly_detector.pth"
+model_path = r"C:\Users\ipand\Desktop\AnomalyDetector\cnn_lstm_anomaly_detector.pth"
 
 
 device ="cuda:0" if torch.cuda.is_available() else "cpu"
-model_path = r'C:\Users\ipand\Desktop\AnamolyDetector\cnn_lstm_anomaly_detector.pth'
+model_path = r'C:\Users\ipand\Desktop\AnomalyDetector\cnn_lstm_anomaly_detector.pth'
 
 test_dataset = MVTecDataset(
     root_dir=root_dir,
@@ -26,10 +26,10 @@ test_dataset = MVTecDataset(
 
 test_loader = DataLoader(test_dataset , batch_size= 32 ,shuffle=False)
 
-model = AnamolyDetector().to(device)
+model = AnomalyDetector().to(device)
 model.load_state_dict(torch.load(model_path))
 
-print(f"Model loaded succesfully from {model_path} and set to rval mode")
+print(f"Model loaded succesfully from {model_path} and set to eval mode")
 
 
 # The validation loop

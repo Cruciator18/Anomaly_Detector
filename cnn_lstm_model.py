@@ -3,7 +3,7 @@ import torch.nn as nn
 from torchvision import models
 from data_loader import train_loader , test_loader
 
-class AnamolyDetector(nn.Module):
+class AnomalyDetector(nn.Module):
     def __init__(self ,lstm_hidden_size =512 , num_lstm_layers =2 ):
         super().__init__()
         
@@ -46,7 +46,7 @@ class AnamolyDetector(nn.Module):
                 return reconstructed_features , features       
             
             
-model = AnamolyDetector()
+model = AnomalyDetector()
 device = "cuda:0" if torch.cuda.is_available() else "cpu"            
 
 model.to(device)

@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: anomaly-detector-pod
+spec:
+  containers:
+  - name: pytorch-container
+    image: anomaly-detector:v1
+   
+    imagePullPolicy: Never 
+    
+    command: ["sleep", "infinity"]
+    
+ 
+    # resources:
+    #   limits:
+    #     nvidia.com/gpu: 1
+        
+   
+    volumeMounts:
+    - mountPath: /app/mvtec_anomaly_detection
+      name: dataset-volume
+      
+ 
+  volumes:
+  - name: dataset-volume
+    hostPath:
+      path: /run/desktop/mnt/host/c/Users/ipand/Desktop/AnamolyDetector/mvtec_anomaly_detection
+      type: Directory

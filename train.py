@@ -14,8 +14,7 @@ device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
 criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(
-    # IMPORTANT: We only pass the parameters of the parts we want to train.
-    # The feature_extractor is frozen.
+
     list(model.lstm.parameters()) + list(model.decoder.parameters()),
     lr=LEARNING_RATE
 )

@@ -11,7 +11,7 @@ from cnn_lstm_model import AnomalyDetector
 
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
 threshold_value = 0.21
-model_path = r"C:\Users\ipand\Desktop\AnamolyDetector\cnn_lstm_anomaly_detector.pth"
+model_path = "cnn_lstm_anomaly_detector.pth"
 
 
 def predict_anomaly(image_path : str , model: nn.Module):
@@ -62,6 +62,12 @@ if __name__ == '__main__':
     # Load the trained model
     print("Loading trained model...")
     model = AnomalyDetector().to(device)
-    model.load_state_dict(torch.load(model_path,weights_only=True))
+    if torch.cuda.is_available():
+     print(f"GPU detected. Loading model onto {device}...")
+     checkpoint = torch.load(model_path, weights_only=True)
+    else:
+     print("No GPU found. Force-mapping model to CPU...")
+     checkpoint = torch.load(model_path, map_location=torch.device('cpu'), weights_only=True)
+    model.load_state_dict(checkpoint) 
     print("Model loaded successfully.")
     predict_anomaly(args.image_path, model)

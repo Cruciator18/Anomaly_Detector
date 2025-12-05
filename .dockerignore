@@ -1,0 +1,8 @@
+.venv
+venv
+__pycache__
+.git
+mvtec_anomaly_detection.tar.xz
+mvtec_anomaly_detection
+dataset/
+data/

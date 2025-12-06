@@ -2,3 +2,6 @@ numpy
 Pillow
 seaborn
 torchvision
+fastapi
+uvicorn
+python-multipart

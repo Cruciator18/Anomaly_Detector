@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: anomaly-detector-deploy  # Name of the Manager
+spec:
+  replicas: 2  # TELLING K8S: "I want 2 copies running at all times"
+  
+  selector:
+    matchLabels:
+      app: anomaly-detector 
+      
+  template:  # --- START OF THE POD TEMPLATE ---
+    metadata:
+      labels:
+        app: anomaly-detector  
+    spec:
+      containers:
+      - name: pytorch-container
+        image: anomaly-detector:v1
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 80
+
+        resources:
+          requests:
+             cpu: "200m"
+          limits:
+             cpu: "500m"   
+        # command: ["sleep", "infinity"]
+        
+
+        
+        volumeMounts:
+        - mountPath: /app/mvtec_anomaly_detection
+          name: dataset-volume
+          
+      volumes:
+      - name: dataset-volume
+        hostPath:
+          # Your WSL2/Windows Path
+          path: /run/desktop/mnt/host/c/Users/ipand/Desktop/AnamolyDetector/mvtec_anomaly_detection
+          type: Directory

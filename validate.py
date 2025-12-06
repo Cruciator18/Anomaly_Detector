@@ -9,7 +9,7 @@ from data_loader import transform , MVTecDataset
 from cnn_lstm_model import AnomalyDetector
 
 
-category = "metal_nut"
+category = "metal_nut" #select anyone from dataset
 root_dir = r"mvtec_anomaly_detection"
 model_path = r"C:\Users\ipand\Desktop\AnomalyDetector\cnn_lstm_anomaly_detector.pth"
 

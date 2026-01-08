@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: anomaly-detector-deploy  # Name of the Manager
 spec:
-  replicas: 2  # TELLING K8S: "I want 2 copies running at all times"
+  replicas: 2 
   
   selector:
     matchLabels:

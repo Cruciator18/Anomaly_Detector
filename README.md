@@ -1,4 +1,4 @@
-# CNN-LSTM Anomaly Detector
+# CNN-LSTM Anamoly Detector
 This project implements a hybrid deep learning architecture for anomaly detection. It combines a pre-trained Convolutional Neural Network (CNN) for feature extraction with a Long Short-Term Memory (LSTM) network for reconstruction.
 ## Model Architecture & Theory
  This system operates on the principle of Reconstruction-based Anomaly Detection. The model is trained only on "normal" data. When it encounters an anomaly, it will fail to reconstruct the features accurately, resulting in a high error score.
@@ -36,6 +36,7 @@ The script prints the Average Loss per epoch.Upon completion, the model weights 
 ##  Inference Strategy (How to detect anomalies):
 Once trained, use the model to detect anomalies as follows:
 Pass a new image through the model -> Calculate the MSE Loss between the original_features and reconstructed_features -> Thresholding: If the Loss > Threshold, the image is an Anomaly. If Loss < Threshold, it is Normal.
+
 
 
 

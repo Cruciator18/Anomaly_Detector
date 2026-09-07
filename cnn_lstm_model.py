@@ -1,68 +1,46 @@
 import torch
 import torch.nn as nn
-from torchvision import models
 
+from data_loader import train_loader
+from cnn_lstm_model import AnomalyDetector
 
-class AnomalyDetector(nn.Module):
-    def __init__(self, lstm_hidden_size=512, num_lstm_layers=2, dropout=0.3):
-        super().__init__()
+BATCH_SIZE = 32
+EPOCHS = 20
+LEARNING_RATE = 0.001
+DROPOUT = 0.3
 
-        resnet = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
-        self.feature_extractor = nn.Sequential(*list(resnet.children())[:-1])
+device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
-        # Freezing the weights of the pretrained model, so that it doesn't
-        # update during training
-        for param in self.feature_extractor.parameters():
-            param.requires_grad = False
+model = AnomalyDetector(dropout=DROPOUT).to(device)
+model.train()
 
-        # NOTE: these were previously indented inside the freezing loop above,
-        # which meant they were (re)defined on every loop iteration instead of
-        # once, and `self.drop` referenced an undefined `dropout` variable.
-        cnn_output_features = 512
+criterion = nn.MSELoss()
+# Only optimize the trainable parts (LSTM + dropout has no params + decoder);
+# the CNN backbone is frozen inside the model itself.
+optimizer = torch.optim.Adam(
+    list(model.lstm.parameters()) + list(model.decoder.parameters()),
+    lr=LEARNING_RATE,
+)
 
-        self.lstm = nn.LSTM(
-            input_size=cnn_output_features,
-            hidden_size=lstm_hidden_size,
-            num_layers=num_lstm_layers,
-            batch_first=True,
-        )
-        self.drop = nn.Dropout(p=dropout)
-        self.decoder = nn.Linear(lstm_hidden_size, cnn_output_features)
+for epoch in range(EPOCHS):
+    model.train()
+    running_loss = 0.0
 
-    def forward(self, x):
-        batch_size = x.size(0)
+    for images, _ in train_loader:
+        images = images.to(device)
 
-        # Freeze the backbone at inference-graph level too — no need to
-        # track gradients through frozen weights.
-        with torch.no_grad():
-            features = self.feature_extractor(x)
-        features = features.view(batch_size, -1)
+        reconstructed_features, original_features = model(images)
 
-        # LSTM expects (batch, seq_len, input_size). We only have a single
-        # "time step" per image here, so seq_len = 1.
-        lstm_input = features.unsqueeze(1)
-        lstm_out, _ = self.lstm(lstm_input)
-        lstm_out = self.drop(lstm_out.squeeze(1))
+        loss = criterion(reconstructed_features, original_features)
 
-        reconstructed_features = self.decoder(lstm_out)
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
 
-        return reconstructed_features, features
+        running_loss += loss.item() * images.size(0)
 
+    epoch_loss = running_loss / len(train_loader.dataset)
+    print(f"Epoch {epoch + 1}/{EPOCHS} | Training Loss: {epoch_loss:.6f}")
 
-if __name__ == "__main__":
-    # Simple smoke test. Requires data_loader.py with a `train_loader`
-    # variable that yields (images, labels) batches.
-    from data_loader import train_loader
-
-    device = "cuda:0" if torch.cuda.is_available() else "cpu"
-    print(f"Model running on device: {device}")
-
-    model = AnomalyDetector().to(device)
-
-    images, _ = next(iter(train_loader))
-    images = images.to(device)
-
-    reconstructed, original = model(images)
-    print(f"Input image batch shape: {images.shape}")
-    print(f"Original features shape: {original.shape}")
-    print(f"Reconstructed features shape: {reconstructed.shape}")
+torch.save(model.state_dict(), "cnn_lstm_anomaly_detector.pth")
+print("Model weights saved to cnn_lstm_anomaly_detector.pth")

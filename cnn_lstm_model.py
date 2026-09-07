@@ -26,7 +26,10 @@ class AnomalyDetector(nn.Module):
                 num_layers = num_lstm_layers,
                 batch_first=True
             )
-            
+
+            self.drop = nn.Dropout(p=dropout)
+        
+          
             
             self.decoder = nn.Linear(lstm_hidden_size , cnn_output_features)
     
